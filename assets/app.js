@@ -1,5 +1,9 @@
 const hasGsap = !!(window.gsap && window.ScrollTrigger);
-const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const LANG = (document.documentElement.lang || 'uz').slice(0, 2);
+const SEP = { uz: '\u00a0', ru: '\u00a0', en: ',' }[LANG] || '\u00a0';
+const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, SEP);
+/* til almashtirganda bo'lim (#) saqlansin */
+document.querySelectorAll('.lang a').forEach(a => a.addEventListener('click', () => { if (location.hash) a.href = a.getAttribute('href').split('#')[0] + location.hash; }));
 
 /* harflarga bo'lish (maxsus kutubxonasiz) */
 function splitChars(el){
