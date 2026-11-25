@@ -18,6 +18,21 @@ document.querySelector('.name .line:nth-child(2)').setAttribute('aria-hidden','t
 const about = document.getElementById('about');
 about.innerHTML = about.textContent.trim().split(/\s+/).map(w => `<span class="w">${w}</span>`).join(' ');
 
+/* tez savollar: tayyor javoblar */
+(function(){
+  const box = document.getElementById('qans'); if (!box) return;
+  const btns = [...document.querySelectorAll('.qbtn')];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  btns.forEach(b => b.addEventListener('click', () => {
+    const on = b.getAttribute('aria-pressed') === 'true';
+    btns.forEach(x => x.setAttribute('aria-pressed', 'false'));
+    if (on){ box.innerHTML = '<p class="qempty"></p>'; box.firstChild.textContent = box.dataset.empty; return; }
+    b.setAttribute('aria-pressed', 'true');
+    box.innerHTML = document.getElementById(b.dataset.a).innerHTML;
+    if (window.gsap && !reduced) gsap.from(box.firstElementChild, { y: 10, opacity: 0, duration: .45, ease: 'power3.out', clearProps: 'all' });
+  }));
+})();
+
 if (hasGsap){
   gsap.registerPlugin(ScrollTrigger);
   const mm = gsap.matchMedia();
@@ -127,7 +142,31 @@ if (hasGsap){
         spot.style.setProperty('--mx', (e.clientX - r.left) + 'px');
         spot.style.setProperty('--my', (e.clientY - r.top) + 'px');
         const nx = e.clientX / innerWidth - .5, ny = e.clientY / innerHeight - .5;
-        deckCards.forEach(o => { o.x(-nx * o.d * 2); o.y(-ny * o.d * 2); });
+        deckCards.forEach(o => { if (!o.busy) { o.x(-nx * o.d * 2); o.y(-ny * o.d * 2); } });
+      });
+
+      /* kartalarni sudrash: qo'yib yuborilganda joyiga qaytadi */
+      let drag = null;
+      deckCards.forEach(o => {
+        const c = o.c;
+        on(c, 'pointerdown', e => {
+          if (e.pointerType === 'touch' || e.button !== 0) return;
+          o.busy = true; gsap.killTweensOf(c, 'x,y,rotation');
+          drag = { o, sx: e.clientX, sy: e.clientY, bx: +gsap.getProperty(c, 'x'), by: +gsap.getProperty(c, 'y'), br: +gsap.getProperty(c, 'rotation'), px: e.clientX };
+          c.setPointerCapture(e.pointerId); c.classList.add('drag');
+        });
+        on(c, 'pointermove', e => {
+          if (!drag || drag.o !== o) return;
+          gsap.set(c, { x: drag.bx + e.clientX - drag.sx, y: drag.by + e.clientY - drag.sy });
+          gsap.to(c, { rotation: drag.br + gsap.utils.clamp(-9, 9, (e.clientX - drag.px) * .7), duration: .25, overwrite: 'auto' });
+          drag.px = e.clientX;
+        });
+        const end = () => {
+          if (!drag || drag.o !== o) return;
+          const br = drag.br; drag = null; c.classList.remove('drag');
+          gsap.to(c, { x: 0, y: 0, rotation: br, duration: 1.1, ease: 'elastic.out(1,.55)', onComplete: () => { o.busy = false; } });
+        };
+        on(c, 'pointerup', end); on(c, 'pointercancel', end);
       });
       cleanups.push(() => ring.classList.remove('on'));
       document.querySelectorAll('.shine').forEach(el => {
