@@ -201,8 +201,10 @@ section.works{padding-top:clamp(40px,6vw,80px)}
 
 /* tech */
 .tech{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.tech a{display:flex;flex-direction:column;gap:6px;padding:22px 24px;border-radius:24px;text-decoration:none;transition:border-color .25s}
+.tech a,.tech .card{display:flex;flex-direction:column;gap:6px;padding:22px 24px;border-radius:24px;text-decoration:none;transition:border-color .25s}
 .tech a:hover{border-color:rgba(23,64,47,.55)}
+.tech .wide{grid-column:1/-1;gap:8px}
+.tech .wide span{max-width:68ch}
 .tech b{font:700 24px/1.1 var(--display);letter-spacing:-.02em}
 .tech span{color:var(--muted);font-size:15px}
 .tech em{font-style:normal;font-size:13px;color:var(--green);letter-spacing:.06em;margin-top:2px;transition:letter-spacing .3s}

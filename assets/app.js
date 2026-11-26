@@ -100,7 +100,7 @@ if (hasGsap){
       scrollTrigger: { trigger: '#about', start: 'top 82%', end: 'bottom 52%', scrub: true } });
 
     /* bloklar */
-    gsap.utils.toArray('.sec-h, .stats-card, .about-meta > div, .panel, .sub, .tile, .skill, .tech a').forEach(el => {
+    gsap.utils.toArray('.sec-h, .stats-card, .about-meta > div, .panel, .sub, .tile, .skill, .tech > *').forEach(el => {
       gsap.from(el, { y: 40, opacity: .1, duration: .9, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 92%', once: true } });
     });
 
